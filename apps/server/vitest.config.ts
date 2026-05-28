@@ -26,6 +26,7 @@ export default defineConfig({
         "drizzle.config.ts",
         "tests/**",
         "src/index.ts", // exclude production bootstrap entrypoint
+        "src/worker.ts", // exclude worker bootstrap entrypoint
         "src/config.ts", // config loader
         "src/db/migrate.ts", // migration runner script
         "src/db/seed.ts",

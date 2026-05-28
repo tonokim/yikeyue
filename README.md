@@ -42,6 +42,9 @@ pnpm --filter @yikey/server db:migrate
 ```bash
 # 以监听模式运行服务端应用
 pnpm dev:server
+
+# 以监听模式运行 Worker 进程
+pnpm dev:worker
 ```
 
 ---
@@ -122,3 +125,26 @@ feat(infra): initialize hono server and pg database connection pool
 fix(middleware): resolve redis idempotency cache connection timeout
 test(integration): add test suite for rate limiting middleware
 ```
+
+---
+
+## Queue Worker 部署与运行
+
+Yikeyue 的队列与 Worker 架构基于 BullMQ 和 Redis 实现。
+
+### 本地开发运行
+- 启动 HTTP Server：`pnpm dev:server`
+- 启动 Worker 进程（独立进程，不监听 HTTP 端口）：`pnpm dev:worker`
+
+### 生产容器部署
+HTTP 服务端与 Worker 进程使用**相同的 Docker 镜像**（即同一份编译产物），但在部署容器时需配置不同的启动命令（Entrypoint/Command）：
+
+1. **HTTP Server 容器**：
+   - 启动命令：`node dist/index.js`
+   - 需对外暴露 HTTP 端口（默认 3000）
+2. **Worker 容器**：
+   - 启动命令：`node dist/worker.js`
+   - **不需要**暴露任何外部网络端口，只负责连接 PostgreSQL 和 Redis 处理后台任务
+   - 支持 `SIGTERM` 和 `SIGINT` 信号优雅关闭，在接收到信号后最多等待 30 秒完成在途任务后安全退出。
+
+参考 [docker-compose.yml](file:///Users/yuzhangjun/work/dora/yikeyue/docker-compose.yml) 中的 `server` 与 `worker` 服务配置模板。

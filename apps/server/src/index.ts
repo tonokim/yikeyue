@@ -5,6 +5,8 @@ import { createDb } from "./db/index.js";
 import { createRedisClient } from "./redis.js";
 import { createApp } from "./app.js";
 import { logger } from "./logger/index.js";
+import { createQueueConnection, QueueRegistry, registerPayloadSchema } from "./queue/index.js";
+import { infraPingSchema, deadLetterScanSchema } from "@yikey/shared";
 
 async function bootstrap() {
   logger.info("Bootstrapping server...");
@@ -34,6 +36,14 @@ async function bootstrap() {
     logger.fatal({ err }, "Failed to connect to Redis");
     process.exit(1);
   }
+
+  // Initialize dedicated Queue connection & register schemas/queues
+  const queueRedis = createQueueConnection(config.REDIS_URL);
+  QueueRegistry.setConnection(queueRedis);
+  registerPayloadSchema("infra:ping", infraPingSchema);
+  registerPayloadSchema("infra:dead-letter-scan", deadLetterScanSchema);
+  QueueRegistry.register("infra:ping");
+  QueueRegistry.register("infra:dead-letter-scan");
 
   const db = createDb(pool);
   const clock = () => new Date();

@@ -31,6 +31,40 @@ services:
       timeout: 5s
       retries: 5
 
+  # ---------------------------------------------------------------------------
+  # Application Services (Production/Deployment Example)
+  # Both services share the same Dockerfile/image but run different commands.
+  # ---------------------------------------------------------------------------
+  # server:
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile
+  #   command: pnpm dev:server
+  #   ports:
+  #     - "3000:3000"
+  #   environment:
+  #     - DATABASE_URL=postgres://postgres:postgres@postgres:5432/yikeyue
+  #     - REDIS_URL=redis://redis:6379/0
+  #   depends_on:
+  #     postgres:
+  #       condition: service_healthy
+  #     redis:
+  #       condition: service_healthy
+
+  # worker:
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile
+  #   command: pnpm dev:worker
+  #   environment:
+  #     - DATABASE_URL=postgres://postgres:postgres@postgres:5432/yikeyue
+  #     - REDIS_URL=redis://redis:6379/0
+  #   depends_on:
+  #     postgres:
+  #       condition: service_healthy
+  #     redis:
+  #       condition: service_healthy
+
 volumes:
   pgdata:
   redisdata:

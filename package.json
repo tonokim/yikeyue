@@ -15,7 +15,9 @@
     "pretest:coverage": "pnpm build:shared",
     "test:coverage": "pnpm --filter @yikey/server test:coverage",
     "predev:server": "pnpm build:shared",
-    "dev:server": "pnpm --filter @yikey/server dev"
+    "dev:server": "pnpm --filter @yikey/server dev",
+    "predev:worker": "pnpm build:shared",
+    "dev:worker": "pnpm --filter @yikey/server dev:worker"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
