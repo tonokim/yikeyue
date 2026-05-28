@@ -92,3 +92,29 @@ export const upload = pgTable("upload", {
   createdAt: createdAt(),
   updatedAt: updatedAt(),
 });
+
+/**
+ * User Identity and Profile Table.
+ * Tracks user details including WeChat openid, unique variable-length business UID, and status.
+ */
+export const user = pgTable("user", {
+  id: cuidPrimaryKey(),
+  openid: varchar("openid", { length: 255 }).unique().notNull(),
+  uid: varchar("uid", { length: 255 }).unique().notNull(), // variable-length varchar
+  nickname: varchar("nickname", { length: 255 }),
+  avatar: text("avatar"),
+  phone: varchar("phone", { length: 50 }),
+  city: varchar("city", { length: 255 }),
+  status: varchar("status", { length: 50 }).default("active").notNull(), // 'active' | 'frozen'
+  createdAt: createdAt(),
+  updatedAt: updatedAt(),
+});
+
+/**
+ * UID Generation Sequence Table.
+ * Stores the last allocated sequence ID for each calendar year.
+ */
+export const uidSequence = pgTable("uid_sequence", {
+  year: integer("year").primaryKey(),
+  lastSeq: integer("last_seq").default(1).notNull(),
+});

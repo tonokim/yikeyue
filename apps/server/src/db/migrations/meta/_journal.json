@@ -15,6 +15,13 @@
       "when": 1779969419225,
       "tag": "0001_natural_fantastic_four",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1779980902609,
+      "tag": "0002_cloudy_major_mapleleaf",
+      "breakpoints": true
     }
   ]
 }
