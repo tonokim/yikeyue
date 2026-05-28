@@ -23,6 +23,7 @@ async function generateAccessToken(userId: string, userUid: string, jwtSecret: s
     id: userId,
     uid: userUid,
     role: "user",
+    typ: "weapp",
   })
     .setProtectedHeader({ alg: "HS256" })
     .setSubject(userId)

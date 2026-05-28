@@ -27,14 +27,14 @@ export function createJwtMiddleware(jwtSecret: string) {
         if (
           payload &&
           typeof payload.id === "string" &&
-          typeof payload.uid === "string" &&
           typeof payload.role === "string"
         ) {
           const user: UserPayload = {
             id: payload.id,
-            uid: payload.uid,
+            uid: typeof payload.uid === "string" ? payload.uid : undefined,
             role: payload.role,
             storeId: typeof payload.storeId === "string" ? payload.storeId : null,
+            typ: typeof payload.typ === "string" ? payload.typ : undefined,
           };
           c.set("user", user);
         }

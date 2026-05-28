@@ -7,6 +7,7 @@ import { errorHandler } from "./middleware/error.js";
 import { createHealthRouter } from "./health/index.js";
 import { createStorageRouter } from "./storage/router.js";
 import { createUserRouter } from "./user/router.js";
+import { createAdminAuthRouter, createStoreAdminRouter } from "./auth/router.js";
 import { DatabaseInstance } from "./db/index.js";
 import { Redis } from "ioredis";
 import { BizError } from "./errors.js";
@@ -84,6 +85,8 @@ export function createApp(options: CreateAppOptions): Hono<AppEnv> {
   app.route("/health", createHealthRouter(redis));
   app.route("/upload", createStorageRouter());
   app.route("/weapp", createUserRouter(jwtSecret));
+  app.route("/admin/auth", createAdminAuthRouter(jwtSecret));
+  app.route("/store-admin", createStoreAdminRouter());
 
   // Custom 404 handler (uniform contract)
   app.notFound((c) => {

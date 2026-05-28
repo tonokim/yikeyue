@@ -53,6 +53,20 @@ async function bootstrap() {
 
 
   const db = createDb(pool);
+
+  // Seed initial super admin on startup using config credentials
+  try {
+    const { seedSuperAdmin } = await import("./auth/service.js");
+    await seedSuperAdmin(db, config.SEED_SUPER_ADMIN_PHONE, config.SEED_SUPER_ADMIN_PASSWORD);
+    logger.info("Super admin seeded successfully.");
+  } catch (err) {
+    logger.error({ err }, "Failed to seed super admin");
+    if (config.NODE_ENV === "production") {
+      logger.fatal("Failed to seed initial super admin in production. Aborting startup.");
+      process.exit(1);
+    }
+  }
+
   const clock = () => new Date();
   const jwtSecret = config.JWT_SECRET;
 

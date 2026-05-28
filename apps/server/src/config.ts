@@ -27,6 +27,13 @@ const configSchema = z.object({
   QINIU_CDN_DOMAIN: isTest ? z.string().default("http://mock-cdn.yikeyue.com") : z.string(),
   QINIU_PRIVATE_CDN_DOMAIN: isTest ? z.string().default("http://mock-private-cdn.yikeyue.com") : z.string(),
   QINIU_REGION: z.string().default("z0"),
+
+  SEED_SUPER_ADMIN_PHONE: process.env.NODE_ENV === "production"
+    ? z.string().regex(/^1\d{10}$/, "Invalid phone number format")
+    : z.string().regex(/^1\d{10}$/, "Invalid phone number format").default("18888888888"),
+  SEED_SUPER_ADMIN_PASSWORD: process.env.NODE_ENV === "production"
+    ? z.string().min(12)
+    : z.string().min(12).default("SuperAdminPassword123!"),
 });
 
 export type Config = z.infer<typeof configSchema>;

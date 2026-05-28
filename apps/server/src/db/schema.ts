@@ -1,5 +1,6 @@
-import { pgTable, varchar, timestamp, date, time, integer, text } from "drizzle-orm/pg-core";
+import { pgTable, varchar, timestamp, date, time, integer, text, check } from "drizzle-orm/pg-core";
 import { createId } from "@paralleldrive/cuid2";
+import { sql } from "drizzle-orm";
 
 /**
  * Primary key column helper using cuid2.
@@ -118,3 +119,24 @@ export const uidSequence = pgTable("uid_sequence", {
   year: integer("year").primaryKey(),
   lastSeq: integer("last_seq").default(1).notNull(),
 });
+
+/**
+ * Admin User Table.
+ * Tracks administrator accounts for stores and operations.
+ */
+export const adminUser = pgTable("admin_user", {
+  id: cuidPrimaryKey(),
+  phone: varchar("phone", { length: 50 }).unique().notNull(),
+  passwordHash: varchar("password_hash", { length: 255 }).notNull(),
+  role: varchar("role", { length: 50 }).notNull(), // 'super_admin' | 'store_owner' | 'store_staff'
+  storeId: varchar("store_id", { length: 255 }),
+  name: varchar("name", { length: 255 }).notNull(),
+  status: varchar("status", { length: 50 }).default("active").notNull(), // 'active' | 'frozen'
+  createdAt: createdAt(),
+  updatedAt: updatedAt(),
+}, (_table) => ({
+  storeIdConstraint: check("store_id_constraint", sql`
+    (role = 'super_admin' AND store_id IS NULL) OR
+    (role IN ('store_owner', 'store_staff') AND store_id IS NOT NULL)
+  `),
+}));
