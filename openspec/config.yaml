@@ -1,0 +1,35 @@
+schema: spec-driven
+
+context: |
+  Language: Chinese (Simplified)
+  Write all artifacts (proposal.md, design.md, tasks.md 等) in Chinese.
+  但保持以下技术关键词为英文：API、REST、GraphQL、JSON、Endpoint、Schema、Model、Service 等。
+  Spec 中的结构化标记（如 ## 新增需求、#### 场景）使用中文。
+
+  易可约 - 微信小程序高端顾问预约平台（理发/美容/按摩等）。
+  4 端 MVP：用户端小程序 / 顾问工作台（嵌入小程序）/ 门店后台 Web / 运营后台 Web。
+
+  完整产品需求：见仓库根目录 PRD.md
+
+  本项目所有 change 提案必须先阅读以下三份文档：
+    - openspec/project.md              技术栈、代码组织、API/命名/测试/Git 约定、MVP 排除项
+    - openspec/capability-map.md       21 个 capability 清单 + 12 个开发阶段 + 依赖关系
+    - openspec/cross-cutting-rules.md  10 条架构不变量（UID/订单状态机/slot-engine/爽约/会员门槛/时间/上传/通知/RBAC/错误码）
+
+  关键约束（写 proposal 前先确认你没违反）：
+    - 状态流转必须经过 order state machine 模块
+    - 时段计算只有一份实现（slot-engine），所有接口调用同一个函数
+    - 爽约按 (user, store) 维度累计，不全局封禁
+    - 会员门槛只挡 /slots 和 POST /orders 两个接口
+    - API JSON snake_case，TS 内部 camelCase，Zod 在边界 transform
+    - 所有 ID 字符串、时间戳 UTC Z 后缀、金额整数分
+
+rules:
+  proposal:
+    - 必须列出影响的 capability 列表（引用 capability-map.md 的名称）
+    - 必须在 Non-goals 里写清楚不做什么，避免 scope creep
+    - 如果改动横切规则，必须在 proposal 顶部用 ⚠️ 显式标注
+  tasks:
+    - 单个 task 控制在 2 小时以内
+    - 测试 task 与实现 task 分开列
+    - 数据库迁移 task 独立列出
