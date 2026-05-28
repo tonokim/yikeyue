@@ -6,7 +6,8 @@ import { createRedisClient } from "./redis.js";
 import { createApp } from "./app.js";
 import { logger } from "./logger/index.js";
 import { createQueueConnection, QueueRegistry, registerPayloadSchema } from "./queue/index.js";
-import { infraPingSchema, deadLetterScanSchema } from "@yikey/shared";
+import { infraPingSchema, deadLetterScanSchema, wechatSubscribeJobSchema } from "@yikey/shared";
+import { initWeChatService } from "./wechat/index.js";
 
 async function bootstrap() {
   logger.info("Bootstrapping server...");
@@ -37,13 +38,19 @@ async function bootstrap() {
     process.exit(1);
   }
 
+  // Initialize WeChat Service
+  initWeChatService(redis);
+
   // Initialize dedicated Queue connection & register schemas/queues
   const queueRedis = createQueueConnection(config.REDIS_URL);
   QueueRegistry.setConnection(queueRedis);
   registerPayloadSchema("infra:ping", infraPingSchema);
   registerPayloadSchema("infra:dead-letter-scan", deadLetterScanSchema);
+  registerPayloadSchema("notify:wechat-subscribe", wechatSubscribeJobSchema);
   QueueRegistry.register("infra:ping");
   QueueRegistry.register("infra:dead-letter-scan");
+  QueueRegistry.register("notify:wechat-subscribe");
+
 
   const db = createDb(pool);
   const clock = () => new Date();

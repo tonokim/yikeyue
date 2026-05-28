@@ -23,6 +23,25 @@ function createPrefixedRedisProxy(redis: RedisClient, prefix: string): RedisClie
       const original = Reflect.get(target, prop, receiver);
       if (typeof original === "function" && typeof prop === "string") {
         const cmd = prop.toLowerCase();
+        if (cmd === "eval") {
+          return function (...args: any[]) {
+            const numKeys = typeof args[1] === "number" ? args[1] : parseInt(args[1], 10);
+            if (Number.isInteger(numKeys)) {
+              for (let i = 0; i < numKeys; i++) {
+                if (typeof args[2 + i] === "string") {
+                  args[2 + i] = `${prefix}${args[2 + i]}`;
+                }
+              }
+            }
+            return original.apply(target, args);
+          };
+        }
+        if (cmd === "del") {
+          return function (...args: any[]) {
+            const prefixedArgs = args.map((arg) => (typeof arg === "string" ? `${prefix}${arg}` : arg));
+            return original.apply(target, prefixedArgs);
+          };
+        }
         if (keyCommands.has(cmd)) {
           return function (...args: any[]) {
             if (args.length > 0 && typeof args[0] === "string") {

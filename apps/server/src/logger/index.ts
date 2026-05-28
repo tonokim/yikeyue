@@ -8,6 +8,8 @@ export const REDACT_PATHS = [
   "*.phone", "*.*.phone", "*.*.*.phone", "*.*.*.*.phone", "*.*.*.*.*.phone",
   // OpenID at any depth (1-5)
   "*.openid", "*.*.openid", "*.*.*.openid", "*.*.*.*.openid", "*.*.*.*.*.openid",
+  // touser (WeChat OpenID) at any depth (1-5)
+  "*.touser", "*.*.touser", "*.*.*.touser", "*.*.*.*.touser", "*.*.*.*.*.touser",
   // Access tokens at any depth (1-5)
   "*.access_token", "*.*.access_token", "*.*.*.access_token", "*.*.*.*.access_token", "*.*.*.*.*.access_token",
   // Password at any depth (1-5)
