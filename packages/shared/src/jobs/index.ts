@@ -19,3 +19,12 @@ export const deadLetterScanSchema = z.object({
 });
 
 export type DeadLetterScanPayload = z.infer<typeof deadLetterScanSchema>;
+
+/**
+ * Payload schema for the daily repeatable `storage:orphan-cleanup` job.
+ */
+export const storageOrphanCleanupSchema = z.object({
+  cleanupTime: z.coerce.number(),
+});
+
+export type StorageOrphanCleanupPayload = z.infer<typeof storageOrphanCleanupSchema>;

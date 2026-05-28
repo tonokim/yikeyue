@@ -77,3 +77,18 @@ export const migrationMeta = pgTable("migration_meta", {
   createdAt: createdAt(),
   updatedAt: updatedAt(),
 });
+
+/**
+ * Storage Upload Intent Table.
+ * Track upload intents, status (pending/confirmed), capability, bound entity, and expiry.
+ */
+export const upload = pgTable("upload", {
+  id: cuidPrimaryKey(),
+  status: varchar("status", { length: 50 }).default("pending").notNull(), // 'pending' | 'confirmed'
+  key: varchar("key", { length: 1024 }).unique().notNull(),              // The unique Qiniu Kodo key
+  capability: varchar("capability", { length: 255 }).notNull(),
+  entityId: varchar("entity_id", { length: 255 }),                        // Nullable, bound business entity ID
+  expiresAt: timestamptz("expires_at").notNull(),                         // Expiry time for cleanup of pending orphans
+  createdAt: createdAt(),
+  updatedAt: updatedAt(),
+});

@@ -5,6 +5,7 @@ import { loggerMiddleware } from "./middleware/logger.js";
 import { createJwtMiddleware } from "./middleware/jwt.js";
 import { errorHandler } from "./middleware/error.js";
 import { createHealthRouter } from "./health/index.js";
+import { createStorageRouter } from "./storage/router.js";
 import { DatabaseInstance } from "./db/index.js";
 import { Redis } from "ioredis";
 import { BizError } from "./errors.js";
@@ -80,6 +81,7 @@ export function createApp(options: CreateAppOptions): Hono<AppEnv> {
 
   // Mount endpoints
   app.route("/health", createHealthRouter(redis));
+  app.route("/upload", createStorageRouter());
 
   // Custom 404 handler (uniform contract)
   app.notFound((c) => {

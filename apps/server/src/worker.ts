@@ -5,10 +5,17 @@ import { QueueRegistry } from "./queue/registry.js";
 import { WorkerRegistry } from "./queue/worker.js";
 import { logger } from "./logger/index.js";
 import { registerPayloadSchema, repeatable } from "./queue/scheduler.js";
-import { infraPingSchema, deadLetterScanSchema, wechatSubscribeJobSchema } from "@yikey/shared";
+import {
+  infraPingSchema,
+  deadLetterScanSchema,
+  wechatSubscribeJobSchema,
+  storageOrphanCleanupSchema
+} from "@yikey/shared";
 import { scanDeadLetters } from "./queue/dead-letter.js";
 import { createRedisClient } from "./redis.js";
 import { initWeChatService, getWeChatService, getTemplateConfig } from "./wechat/index.js";
+import { getQiniuClient } from "./storage/client.js";
+import { cleanupOrphanUploads } from "./storage/cleanup.js";
 
 async function bootstrapWorker() {
   logger.info("Bootstrapping worker process...");
@@ -51,6 +58,7 @@ async function bootstrapWorker() {
   registerPayloadSchema("infra:ping", infraPingSchema);
   registerPayloadSchema("infra:dead-letter-scan", deadLetterScanSchema);
   registerPayloadSchema("notify:wechat-subscribe", wechatSubscribeJobSchema);
+  registerPayloadSchema("storage:orphan-cleanup", storageOrphanCleanupSchema);
 
   const prefix = process.env.QUEUE_PREFIX;
 
@@ -58,6 +66,7 @@ async function bootstrapWorker() {
   QueueRegistry.register("infra:ping", prefix ? { prefix } : undefined);
   QueueRegistry.register("infra:dead-letter-scan", prefix ? { prefix } : undefined);
   QueueRegistry.register("notify:wechat-subscribe", prefix ? { prefix } : undefined);
+  QueueRegistry.register("storage:orphan-cleanup", prefix ? { prefix } : undefined);
 
   // Register Workers
   // 8.1 Implement infra:ping demo queue + processor (labeled clearly for validation, not for business use)
@@ -100,12 +109,30 @@ async function bootstrapWorker() {
     prefix ? { prefix } : undefined
   );
 
+  WorkerRegistry.register(
+    "storage:orphan-cleanup",
+    async (payload, ctx) => {
+      ctx.log.info("Handling storage orphan cleanup job");
+      await cleanupOrphanUploads(ctx.db, getQiniuClient(), ctx.now);
+    },
+    undefined,
+    prefix ? { prefix } : undefined
+  );
+
   // Schedule repeatable dead-letter scan job (daily at midnight: "0 0 * * *")
   try {
     await repeatable("infra:dead-letter-scan", { scanTime: Date.now() }, "0 0 * * *");
     logger.info("Scheduled daily repeatable dead-letter-scan job.");
   } catch (err) {
     logger.error({ err }, "Failed to schedule daily repeatable dead-letter-scan job");
+  }
+
+  // Schedule repeatable storage:orphan-cleanup job (daily at midnight: "0 0 * * *")
+  try {
+    await repeatable("storage:orphan-cleanup", { cleanupTime: Date.now() }, "0 0 * * *");
+    logger.info("Scheduled daily repeatable storage:orphan-cleanup job.");
+  } catch (err) {
+    logger.error({ err }, "Failed to schedule daily repeatable storage:orphan-cleanup job");
   }
 
   // Handle graceful shutdown (D7)

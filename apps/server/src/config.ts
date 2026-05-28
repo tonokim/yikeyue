@@ -19,6 +19,14 @@ const configSchema = z.object({
   WECHAT_API_V3_KEY: isTest ? z.string().default("mock_api_v3_key_32_chars_long_12") : z.string().length(32),
   WECHAT_CERT_SERIAL_NO: isTest ? z.string().default("mock_cert_serial_no") : z.string(),
   WECHAT_PRIVATE_KEY: isTest ? z.string().default("mock_private_key") : z.string(),
+
+  QINIU_ACCESS_KEY: isTest ? z.string().default("mock_qiniu_ak") : z.string(),
+  QINIU_SECRET_KEY: isTest ? z.string().default("mock_qiniu_sk") : z.string(),
+  QINIU_PUBLIC_BUCKET: z.string().default("yikey-public"),
+  QINIU_PRIVATE_BUCKET: z.string().default("yikey-private"),
+  QINIU_CDN_DOMAIN: isTest ? z.string().default("http://mock-cdn.yikeyue.com") : z.string(),
+  QINIU_PRIVATE_CDN_DOMAIN: isTest ? z.string().default("http://mock-private-cdn.yikeyue.com") : z.string(),
+  QINIU_REGION: z.string().default("z0"),
 });
 
 export type Config = z.infer<typeof configSchema>;
