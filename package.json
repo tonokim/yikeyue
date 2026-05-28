@@ -1,0 +1,29 @@
+{
+  "name": "yikeyue",
+  "version": "1.0.0",
+  "private": true,
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "scripts": {
+    "lint": "eslint .",
+    "format": "prettier --write \".\"",
+    "typecheck": "pnpm -r --filter=!./openspec/** typecheck",
+    "build:shared": "pnpm --filter @yikey/shared build",
+    "pretest": "pnpm build:shared",
+    "test": "pnpm --filter @yikey/server test",
+    "pretest:coverage": "pnpm build:shared",
+    "test:coverage": "pnpm --filter @yikey/server test:coverage",
+    "predev:server": "pnpm build:shared",
+    "dev:server": "pnpm --filter @yikey/server dev"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@typescript-eslint/eslint-plugin": "^8.0.0",
+    "@typescript-eslint/parser": "^8.0.0",
+    "eslint": "^9.0.0",
+    "prettier": "^3.3.0",
+    "typescript": "^5.5.0",
+    "typescript-eslint": "^8.0.0"
+  }
+}

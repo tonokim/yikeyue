@@ -1,0 +1,40 @@
+{
+  "name": "@yikey/server",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "build": "tsc",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "tsx src/db/migrate.ts",
+    "db:seed": "tsx src/db/seed.ts"
+  },
+  "dependencies": {
+    "@paralleldrive/cuid2": "^2.2.2",
+    "@yikey/shared": "workspace:*",
+    "hono": "^4.3.7",
+    "@hono/node-server": "^1.11.1",
+    "ioredis": "^5.4.1",
+    "jose": "^5.3.0",
+    "pg": "^8.11.5",
+    "drizzle-orm": "^0.30.10",
+    "dotenv": "^16.4.5",
+    "zod": "^3.23.8",
+    "pino": "^9.1.0"
+  },
+  "devDependencies": {
+    "@testcontainers/postgresql": "^10.9.0",
+    "@types/node": "^20.12.12",
+    "@types/pg": "^8.11.6",
+    "@vitest/coverage-v8": "^1.6.0",
+    "drizzle-kit": "^0.21.4",
+    "pino-pretty": "^11.1.0",
+    "testcontainers": "^10.9.0",
+    "tsx": "^4.10.5",
+    "vitest": "^1.6.0"
+  }
+}
