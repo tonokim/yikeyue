@@ -191,3 +191,22 @@ export const storeCategory = pgTable("store_category", {
 }, (table) => ({
   pk: primaryKey({ columns: [table.storeId, table.categoryId] }),
 }));
+
+/**
+ * Service Item Table.
+ * Tracks service items offered by physical stores.
+ */
+export const service = pgTable("service", {
+  id: cuidPrimaryKey(),
+  storeId: varchar("store_id", { length: 255 }).notNull().references(() => store.id, { onDelete: "cascade" }),
+  categoryId: varchar("category_id", { length: 255 }).notNull().references(() => serviceCategory.id, { onDelete: "cascade" }),
+  name: varchar("name", { length: 255 }).notNull(),
+  priceCents: moneyCents("price_cents").notNull(),
+  currency: currency("currency"),
+  durationMinutes: integer("duration_minutes").notNull(),
+  status: varchar("status", { length: 50 }).default("active").notNull(), // 'active' | 'inactive'
+  sortOrder: integer("sort_order").default(0).notNull(),
+  createdAt: createdAt(),
+  updatedAt: updatedAt(),
+});
+

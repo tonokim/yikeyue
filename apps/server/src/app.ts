@@ -10,6 +10,7 @@ import { createUserRouter } from "./user/router.js";
 import { createAdminAuthRouter, createStoreAdminRouter } from "./auth/router.js";
 import { createAdminCategoryRouter, createPublicCategoryRouter } from "./store/service-category/router.js";
 import { createAdminStoreRouter, createStoreAdminStoreRouter, createPublicStoreRouter } from "./store/router.js";
+import { createStoreAdminServiceRouter, createPublicServiceRouter, createAdminServiceRouter } from "./service/router.js";
 import { DatabaseInstance } from "./db/index.js";
 import { Redis } from "ioredis";
 import { BizError } from "./errors.js";
@@ -94,6 +95,11 @@ export function createApp(options: CreateAppOptions): Hono<AppEnv> {
   app.route("/admin/stores", createAdminStoreRouter());
   app.route("/store-admin/store", createStoreAdminStoreRouter());
   app.route("/weapp/stores", createPublicStoreRouter());
+
+  app.route("/store-admin/services", createStoreAdminServiceRouter());
+  app.route("/weapp/stores/:storeId/services", createPublicServiceRouter());
+  app.route("/admin/stores/:storeId/services", createAdminServiceRouter());
+
 
   // Custom 404 handler (uniform contract)
   app.notFound((c) => {

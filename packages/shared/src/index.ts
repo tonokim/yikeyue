@@ -8,5 +8,7 @@ export * from "./upload/index.js";
 export * from "./user/index.js";
 export * from "./admin/index.js";
 export * from "./store/index.js";
+export * from "./service/index.js";
+
 
 

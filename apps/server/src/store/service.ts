@@ -1,4 +1,4 @@
-import { eq, and, sql, inArray } from "drizzle-orm";
+import { eq, and, inArray } from "drizzle-orm";
 import { DatabaseInstance } from "../db/index.js";
 import { store, storeCategory, serviceCategory, upload } from "../db/schema.js";
 import { BizError } from "../errors.js";
