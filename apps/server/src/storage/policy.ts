@@ -18,6 +18,12 @@ export const UPLOAD_POLICIES: Record<string, UploadPolicy> = {
     allowedMime: ["image/jpeg", "image/png", "image/gif"],
     maxSizeBytes: 2 * 1024 * 1024, // 2MB
   },
+  store: {
+    capability: "store",
+    bucket: config.QINIU_PUBLIC_BUCKET,
+    allowedMime: ["image/jpeg", "image/png", "image/gif", "image/webp"],
+    maxSizeBytes: 5 * 1024 * 1024, // 5MB
+  },
 };
 
 /**

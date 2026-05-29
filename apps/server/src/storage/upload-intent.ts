@@ -10,7 +10,8 @@ import { BizError } from "../errors.js";
 export async function confirmUpload(
   db: DatabaseInstance,
   key: string,
-  entityId?: string | null
+  entityId?: string | null,
+  capability?: string
 ): Promise<void> {
   const updateData: Partial<typeof upload.$inferInsert> & { updatedAt: Date } = {
     status: "confirmed",
@@ -21,10 +22,15 @@ export async function confirmUpload(
     updateData.entityId = entityId;
   }
 
+  const conditions = [eq(upload.key, key), eq(upload.status, "pending")];
+  if (capability) {
+    conditions.push(eq(upload.capability, capability));
+  }
+
   const updatedRows = await db
     .update(upload)
     .set(updateData)
-    .where(and(eq(upload.key, key), eq(upload.status, "pending")))
+    .where(and(...conditions))
     .returning();
 
   if (updatedRows.length === 0) {

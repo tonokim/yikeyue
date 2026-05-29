@@ -8,6 +8,8 @@ import { createHealthRouter } from "./health/index.js";
 import { createStorageRouter } from "./storage/router.js";
 import { createUserRouter } from "./user/router.js";
 import { createAdminAuthRouter, createStoreAdminRouter } from "./auth/router.js";
+import { createAdminCategoryRouter, createPublicCategoryRouter } from "./store/service-category/router.js";
+import { createAdminStoreRouter, createStoreAdminStoreRouter, createPublicStoreRouter } from "./store/router.js";
 import { DatabaseInstance } from "./db/index.js";
 import { Redis } from "ioredis";
 import { BizError } from "./errors.js";
@@ -87,6 +89,11 @@ export function createApp(options: CreateAppOptions): Hono<AppEnv> {
   app.route("/weapp", createUserRouter(jwtSecret));
   app.route("/admin/auth", createAdminAuthRouter(jwtSecret));
   app.route("/store-admin", createStoreAdminRouter());
+  app.route("/admin/service-categories", createAdminCategoryRouter());
+  app.route("/service-categories", createPublicCategoryRouter());
+  app.route("/admin/stores", createAdminStoreRouter());
+  app.route("/store-admin/store", createStoreAdminStoreRouter());
+  app.route("/weapp/stores", createPublicStoreRouter());
 
   // Custom 404 handler (uniform contract)
   app.notFound((c) => {

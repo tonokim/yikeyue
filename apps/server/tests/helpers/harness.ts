@@ -77,6 +77,10 @@ export function createTestHarness() {
   let app: any;
   let testTime = new Date();
 
+  let resolveTx: (() => void) | undefined;
+  let txPromise: Promise<void> | undefined;
+  let transactionPromise: Promise<any> | undefined;
+
   beforeAll(async () => {
     const pgUrl = process.env.TEST_DATABASE_URL;
     const redisUrl = process.env.TEST_REDIS_URL;
@@ -134,10 +138,28 @@ export function createTestHarness() {
     testClient = await pool.connect();
     // Scope connections to the file-specific schema
     await testClient.query(`SET search_path TO "${schemaName}";`);
-    // Start transaction
-    await testClient.query("BEGIN;");
+
+    const baseDb = createDb(testClient);
     
-    db = createDb(testClient);
+    txPromise = new Promise<void>((resolve) => {
+      resolveTx = resolve;
+    });
+
+    let txClient: any;
+    const txStartedPromise = new Promise<void>((resolveStarted) => {
+      transactionPromise = baseDb.transaction(async (tx) => {
+        txClient = tx;
+        resolveStarted();
+        await txPromise;
+        // Throw a specific error to rollback the transaction
+        throw new Error("Force Rollback");
+      });
+    });
+
+    // Wait for the Drizzle transaction to be initialized and set the txClient
+    await txStartedPromise;
+
+    db = txClient;
     testTime = new Date();
 
     app = createApp({
@@ -149,9 +171,21 @@ export function createTestHarness() {
   });
 
   afterEach(async () => {
-    // Rollback changes to keep the schema clean
+    // End the Drizzle transaction by resolving the promise, triggering the forced rollback
+    if (resolveTx) {
+      resolveTx();
+      resolveTx = undefined;
+    }
+    
+    // Wait for the transaction promise to fully complete/rollback
+    if (transactionPromise) {
+      await transactionPromise.catch(() => {
+        // Silently catch the forced rollback error
+      });
+      transactionPromise = undefined;
+    }
+
     if (testClient) {
-      await testClient.query("ROLLBACK;");
       testClient.release();
     }
   });

@@ -7,5 +7,6 @@ export * from "./wechat/index.js";
 export * from "./upload/index.js";
 export * from "./user/index.js";
 export * from "./admin/index.js";
+export * from "./store/index.js";
 
 

@@ -1,4 +1,4 @@
-import { pgTable, varchar, timestamp, date, time, integer, text, check } from "drizzle-orm/pg-core";
+import { pgTable, varchar, timestamp, date, time, integer, text, check, boolean, primaryKey, doublePrecision } from "drizzle-orm/pg-core";
 import { createId } from "@paralleldrive/cuid2";
 import { sql } from "drizzle-orm";
 
@@ -139,4 +139,55 @@ export const adminUser = pgTable("admin_user", {
     (role = 'super_admin' AND store_id IS NULL) OR
     (role IN ('store_owner', 'store_staff') AND store_id IS NOT NULL)
   `),
+}));
+
+/**
+ * Service Category Table.
+ * Tracks global service categories.
+ */
+export const serviceCategory = pgTable("service_category", {
+  id: cuidPrimaryKey(),
+  name: varchar("name", { length: 255 }).unique().notNull(),
+  sortOrder: integer("sort_order").default(0).notNull(),
+  enabled: boolean("enabled").default(true).notNull(),
+  createdAt: createdAt(),
+  updatedAt: updatedAt(),
+});
+
+/**
+ * Store Table.
+ * Tracks operations and configurations of physical stores.
+ */
+export const store = pgTable("store", {
+  id: cuidPrimaryKey(),
+  name: varchar("name", { length: 255 }).notNull(),
+  address: varchar("address", { length: 500 }).notNull(),
+  lat: doublePrecision("lat"),
+  lng: doublePrecision("lng"),
+  phone: varchar("phone", { length: 50 }).notNull(),
+  photos: text("photos"), // Stringified JSON array of keys
+  openAt: time("open_at").notNull(),
+  closeAt: time("close_at").notNull(),
+  status: varchar("status", { length: 50 }).default("draft").notNull(), // 'draft' | 'online' | 'offline' | 'frozen'
+  area: integer("area"),
+  seatCount: integer("seat_count"),
+  description: text("description"),
+  granularityMin: integer("granularity_min").default(30).notNull(),
+  maxAdvanceDays: integer("max_advance_days").default(7).notNull(),
+  minAdvanceMin: integer("min_advance_min").default(30).notNull(),
+  cancelDeadlineMin: integer("cancel_deadline_min").default(60).notNull(),
+  noShowThreshold: integer("no_show_threshold").default(3).notNull(),
+  createdAt: createdAt(),
+  updatedAt: updatedAt(),
+});
+
+/**
+ * Store Category Relation Table.
+ * Many-to-many relationship mapping stores to service categories.
+ */
+export const storeCategory = pgTable("store_category", {
+  storeId: varchar("store_id", { length: 255 }).notNull().references(() => store.id, { onDelete: "cascade" }),
+  categoryId: varchar("category_id", { length: 255 }).notNull().references(() => serviceCategory.id, { onDelete: "cascade" }),
+}, (table) => ({
+  pk: primaryKey({ columns: [table.storeId, table.categoryId] }),
 }));
