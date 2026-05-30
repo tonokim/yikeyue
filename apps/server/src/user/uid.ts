@@ -61,3 +61,33 @@ export async function findUserByUid(db: DatabaseInstance, uid: string) {
 
   return result[0];
 }
+
+/**
+ * Internal-only helper to look up user details by UID, including WeChat openid.
+ */
+export async function findUserByUidInternal(db: DatabaseInstance, uid: string) {
+  const result = await db
+    .select({
+      id: user.id,
+      openid: user.openid,
+      uid: user.uid,
+      nickname: user.nickname,
+      avatar: user.avatar,
+      phone: user.phone,
+      city: user.city,
+      status: user.status,
+      createdAt: user.createdAt,
+      updatedAt: user.updatedAt,
+    })
+    .from(user)
+    .where(eq(user.uid, uid))
+    .limit(1);
+
+  if (result.length === 0) {
+    throw new BizError("user.not_found", `User with UID '${uid}' not found`, {
+      httpStatus: 404,
+    });
+  }
+
+  return result[0];
+}

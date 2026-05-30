@@ -1,4 +1,4 @@
-import { pgTable, varchar, timestamp, date, time, integer, text, check, boolean, primaryKey, doublePrecision } from "drizzle-orm/pg-core";
+import { pgTable, varchar, timestamp, date, time, integer, text, check, boolean, primaryKey, doublePrecision, unique } from "drizzle-orm/pg-core";
 import { createId } from "@paralleldrive/cuid2";
 import { sql } from "drizzle-orm";
 
@@ -209,4 +209,52 @@ export const service = pgTable("service", {
   createdAt: createdAt(),
   updatedAt: updatedAt(),
 });
+
+/**
+ * Tag Table.
+ * Tracks global tags partitioned by type (consultant, review).
+ */
+export const tag = pgTable("tag", {
+  id: cuidPrimaryKey(),
+  name: varchar("name", { length: 255 }).notNull(),
+  type: varchar("type", { length: 50 }).notNull(), // 'consultant' | 'review'
+  sortOrder: integer("sort_order").default(0).notNull(),
+  enabled: boolean("enabled").default(true).notNull(),
+  createdAt: createdAt(),
+  updatedAt: updatedAt(),
+}, (table) => ({
+  typeNameUnique: unique("tag_type_name_unique").on(table.type, table.name),
+}));
+
+/**
+ * Consultant Table.
+ * Tracks consultants bound to a specific store and user.
+ */
+export const consultant = pgTable("consultant", {
+  id: cuidPrimaryKey(),
+  userId: varchar("user_id", { length: 255 }).notNull().references(() => user.id, { onDelete: "cascade" }),
+  storeId: varchar("store_id", { length: 255 }).notNull().references(() => store.id, { onDelete: "cascade" }),
+  name: varchar("name", { length: 255 }).notNull(),
+  avatar: text("avatar"),
+  experienceYears: integer("experience_years").notNull(),
+  level: varchar("level", { length: 100 }).notNull(),
+  rating: doublePrecision("rating").default(0).notNull(),
+  status: varchar("status", { length: 50 }).default("active").notNull(), // 'active' | 'inactive' | 'left'
+  autoConfirm: boolean("auto_confirm").default(false).notNull(),
+  createdAt: createdAt(),
+  updatedAt: updatedAt(),
+}, (table) => ({
+  userStoreUnique: unique("consultant_user_store_unique").on(table.userId, table.storeId),
+}));
+
+/**
+ * Consultant-Tag Relation Table.
+ * Many-to-many relationship mapping consultants to tags.
+ */
+export const consultantTag = pgTable("consultant_tag", {
+  consultantId: varchar("consultant_id", { length: 255 }).notNull().references(() => consultant.id, { onDelete: "cascade" }),
+  tagId: varchar("tag_id", { length: 255 }).notNull().references(() => tag.id, { onDelete: "cascade" }),
+}, (table) => ({
+  pk: primaryKey({ columns: [table.consultantId, table.tagId] }),
+}));
 

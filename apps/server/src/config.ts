@@ -13,6 +13,9 @@ const configSchema = z.object({
   REDIS_URL: z.string().default("redis://localhost:6379"),
   JWT_SECRET: z.string().default("test-jwt-secret-key-at-least-32-chars-long"),
 
+  WECHAT_TEMPLATE_CONSULTANT_BOUND: z.string().default("mock_consultant_bound_template_id"),
+  WECHAT_TEMPLATE_CONSULTANT_UNBOUND: z.string().default("mock_consultant_unbound_template_id"),
+
   WECHAT_APP_ID: isTest ? z.string().default("mock_app_id") : z.string(),
   WECHAT_APP_SECRET: isTest ? z.string().default("mock_app_secret") : z.string(),
   WECHAT_MCH_ID: isTest ? z.string().default("mock_mch_id") : z.string(),

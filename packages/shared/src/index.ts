@@ -9,6 +9,8 @@ export * from "./user/index.js";
 export * from "./admin/index.js";
 export * from "./store/index.js";
 export * from "./service/index.js";
+export * from "./tag/index.js";
+export * from "./consultant/index.js";
 
 
 

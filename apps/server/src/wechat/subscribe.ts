@@ -62,11 +62,17 @@ export const notify = {
     const service = getWeChatService();
     const redis = service.redis;
 
-    // 2. 5min deduplication in Redis
-    const dedupKey = `notify:dedup:${event}:${user}`;
+    // 2. 5min deduplication in Redis (with optional business suffixes)
+    let suffix = "";
+    if (data.storeId) {
+      suffix = `:${data.storeId}`;
+    } else if (data.dedupSuffix) {
+      suffix = `:${data.dedupSuffix}`;
+    }
+    const dedupKey = `notify:dedup:${event}:${user}${suffix}`;
     const acquired = await redis.set(dedupKey, "1", "EX", 300, "NX");
     if (acquired !== "OK") {
-      logger.info({ event, openid: user }, "Duplicate notification skipped (deduplicated)");
+      logger.info({ event, openid: user, suffix }, "Duplicate notification skipped (deduplicated)");
       return false; // deduplicated, skipped
     }
 

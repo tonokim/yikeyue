@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach } from "vitest";
 import { createTestHarness } from "../helpers/harness.js";
-import { generateNextUid, findUserByUid } from "../../src/user/uid.js";
+import { generateNextUid, findUserByUid, findUserByUidInternal } from "../../src/user/uid.js";
 import { findOrCreateUser } from "../../src/user/service.js";
 import { uidSequence, user } from "../../src/db/schema.js";
 import { eq } from "drizzle-orm";
@@ -185,6 +185,44 @@ describe("User & Profile Integration Tests", () => {
 
     it("throws a 404 BizError when user is not found", async () => {
       await expect(findUserByUid(harness.db, "EKY2026000404")).rejects.toThrowError(
+        "User with UID 'EKY2026000404' not found"
+      );
+    });
+  });
+
+  describe("findUserByUidInternal Service", () => {
+    it("returns profile details and includes openid when found", async () => {
+      // Clean table first
+      await harness.db.delete(user);
+      await harness.db.delete(uidSequence);
+
+      // Create user directly
+      const inserted = await harness.db
+        .insert(user)
+        .values({
+          openid: "openid_internal_test",
+          uid: "EKY2026888888",
+          nickname: "Internal User",
+          avatar: "https://avatar.url/internal",
+          phone: "654321",
+          city: "Beijing",
+          status: "active",
+        })
+        .returning();
+
+      const found = await findUserByUidInternal(harness.db, "EKY2026888888");
+      expect(found).toBeDefined();
+      expect(found.id).toBe(inserted[0].id);
+      expect(found.openid).toBe("openid_internal_test");
+      expect(found.uid).toBe("EKY2026888888");
+      expect(found.nickname).toBe("Internal User");
+
+      // Assert openid is NOT omitted
+      expect(found.openid).toBe("openid_internal_test");
+    });
+
+    it("throws a 404 BizError when user is not found", async () => {
+      await expect(findUserByUidInternal(harness.db, "EKY2026000404")).rejects.toThrowError(
         "User with UID 'EKY2026000404' not found"
       );
     });

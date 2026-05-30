@@ -6,8 +6,27 @@ export interface TemplateConfig<E extends string, D> {
 
 export type WeChatEvent = string;
 
+import { config } from "../config.js";
+
 export const WECHAT_TEMPLATES: Record<string, TemplateConfig<any, any>> = {
-  // Empty for production (placeholders/configs registered by individual capabilities later)
+  "consultant.bound": {
+    event: "consultant.bound",
+    templateId: config.WECHAT_TEMPLATE_CONSULTANT_BOUND,
+    buildData: (data: { storeName: string; consultantName: string; date: string }) => ({
+      thing1: { value: data.storeName.substring(0, 20) },
+      name2: { value: data.consultantName.substring(0, 10) },
+      time3: { value: data.date },
+    }),
+  },
+  "consultant.unbound": {
+    event: "consultant.unbound",
+    templateId: config.WECHAT_TEMPLATE_CONSULTANT_UNBOUND,
+    buildData: (data: { storeName: string; consultantName: string; date: string }) => ({
+      thing1: { value: data.storeName.substring(0, 20) },
+      name2: { value: data.consultantName.substring(0, 10) },
+      time3: { value: data.date },
+    }),
+  },
 };
 
 export function getTemplateConfig(event: string): TemplateConfig<any, any> {
