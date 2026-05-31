@@ -11,6 +11,7 @@ export * from "./store/index.js";
 export * from "./service/index.js";
 export * from "./tag/index.js";
 export * from "./consultant/index.js";
+export * from "./consultant-service/index.js";
 
 
 

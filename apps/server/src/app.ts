@@ -12,6 +12,12 @@ import { createAdminCategoryRouter, createPublicCategoryRouter } from "./store/s
 import { createAdminStoreRouter, createStoreAdminStoreRouter, createPublicStoreRouter } from "./store/router.js";
 import { createStoreAdminServiceRouter, createPublicServiceRouter, createAdminServiceRouter } from "./service/router.js";
 import { createAdminTagRouter, createStoreAdminConsultantRouter, createPublicConsultantRouter } from "./consultant/router.js";
+import {
+  createStoreAdminConsultantServiceRouter,
+  createStoreAdminServiceConsultantsRouter,
+  createWeappStoreServiceConsultantsRouter,
+  createWeappConsultantServicesRouter,
+} from "./consultant-service/router.js";
 import { DatabaseInstance } from "./db/index.js";
 import { Redis } from "ioredis";
 import { BizError } from "./errors.js";
@@ -104,6 +110,10 @@ export function createApp(options: CreateAppOptions): Hono<AppEnv> {
   app.route("/admin/tags", createAdminTagRouter());
   app.route("/store-admin/consultants", createStoreAdminConsultantRouter());
   app.route("/weapp/consultants/me", createPublicConsultantRouter());
+  app.route("/store-admin/consultants", createStoreAdminConsultantServiceRouter());
+  app.route("/store-admin/services", createStoreAdminServiceConsultantsRouter());
+  app.route("/weapp/stores", createWeappStoreServiceConsultantsRouter());
+  app.route("/weapp/consultants", createWeappConsultantServicesRouter());
 
 
   // Custom 404 handler (uniform contract)

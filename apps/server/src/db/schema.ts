@@ -1,4 +1,4 @@
-import { pgTable, varchar, timestamp, date, time, integer, text, check, boolean, primaryKey, doublePrecision, unique } from "drizzle-orm/pg-core";
+import { pgTable, varchar, timestamp, date, time, integer, text, check, boolean, primaryKey, doublePrecision, unique, index } from "drizzle-orm/pg-core";
 import { createId } from "@paralleldrive/cuid2";
 import { sql } from "drizzle-orm";
 
@@ -256,5 +256,18 @@ export const consultantTag = pgTable("consultant_tag", {
   tagId: varchar("tag_id", { length: 255 }).notNull().references(() => tag.id, { onDelete: "cascade" }),
 }, (table) => ({
   pk: primaryKey({ columns: [table.consultantId, table.tagId] }),
+}));
+
+/**
+ * Consultant-Service Relation Table.
+ * Many-to-many relationship mapping consultants to service items.
+ */
+export const consultantService = pgTable("consultant_service", {
+  consultantId: varchar("consultant_id", { length: 255 }).notNull().references(() => consultant.id, { onDelete: "cascade" }),
+  serviceId: varchar("service_id", { length: 255 }).notNull().references(() => service.id, { onDelete: "cascade" }),
+  createdAt: createdAt(),
+}, (table) => ({
+  pk: primaryKey({ columns: [table.consultantId, table.serviceId] }),
+  serviceIdIdx: index("idx_consultant_service_service_id").on(table.serviceId),
 }));
 

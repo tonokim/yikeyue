@@ -28,6 +28,12 @@ export const ERROR_CODES = {
   CONSULTANT_INVALID_TAG: "consultant.invalid_tag",
   CONSULTANT_NOT_FOUND: "consultant.consultant_not_found",
 
+  // Consultant Service Binding
+  CONSULTANT_SERVICE_CONSULTANT_LEFT: "consultant_service.consultant_left",
+  CONSULTANT_SERVICE_SERVICE_INACTIVE: "consultant_service.service_inactive",
+  CONSULTANT_SERVICE_CONSULTANT_NOT_FOUND: "consultant_service.consultant_not_found",
+  CONSULTANT_SERVICE_SERVICE_NOT_FOUND: "consultant_service.service_not_found",
+
   // Store & Service & Router
   STORE_NOT_FOUND: "store.store_not_found",
   STORE_CATEGORY_NAME_EXISTS: "store.category_name_exists",
